@@ -1,6 +1,0 @@
-{
-  "buildCommand": "npx turbo build --filter=@recruitment/web",
-  "installCommand": "npm install",
-  "framework": "nextjs",
-  "outputDirectory": "apps/web/.next"
-}
