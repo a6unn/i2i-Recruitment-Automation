@@ -6,6 +6,7 @@
     "packages/*"
   ],
   "scripts": {
+    "postinstall": "prisma generate --schema=apps/web/prisma/schema.prisma",
     "dev": "turbo dev",
     "build": "turbo build",
     "lint": "turbo lint",
