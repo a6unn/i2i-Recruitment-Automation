@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  RECRUITER
+  ADMIN
+}
+
+enum JDStatus {
+  DRAFT
+  PARSED
+  ACTIVE
+  CLOSED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         Role     @default(RECRUITER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  jds            JD[]
+  candidateNotes CandidateNote[]
+}
+
+model JD {
+  id            String   @id @default(cuid())
+  title         String
+  clientName    String?
+  rawText       String
+  googleDocsUrl String?
+  parsedData    Json?
+  scoringConfig Json?
+  searchQueries Json?
+  status        JDStatus @default(DRAFT)
+  userId        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user       User        @relation(fields: [userId], references: [id])
+  candidates Candidate[]
+
+  @@index([userId])
+}
+
+model Candidate {
+  id               String   @id @default(cuid())
+  name             String
+  email            String?
+  phone            String?
+  currentTitle     String?
+  currentCompany   String?
+  totalExperience  String?
+  location         String?
+  skills           String[]
+  profileUrl       String?
+  rawProfileData   Json?
+  jdId             String
+  matchScore       Float?
+  algorithmicScore Float?
+  scoreBreakdown   Json?
+  aiSummary        String?
+  scoreSource      String?
+  pipelineStatus   String   @default("SCREENED")
+  callStatus       String?
+  interestLevel    String?
+  atsCandidateId   String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  jd    JD              @relation(fields: [jdId], references: [id])
+  notes CandidateNote[]
+
+  @@unique([profileUrl, jdId])
+  @@index([jdId])
+}
+
+model CandidateNote {
+  id          String   @id @default(cuid())
+  content     String
+  candidateId String
+  userId      String
+  createdAt   DateTime @default(now())
+
+  candidate Candidate @relation(fields: [candidateId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@index([candidateId])
+}

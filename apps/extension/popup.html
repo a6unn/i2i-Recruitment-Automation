@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      width: 340px;
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 13px;
+      color: #1f2937;
+      background: #fff;
+    }
+    .header {
+      background: linear-gradient(135deg, #1e293b, #334155);
+      color: #fff;
+      padding: 14px 16px;
+    }
+    .header h1 {
+      font-size: 15px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .header p { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+
+    /* States container */
+    .state { display: none; padding: 16px; }
+    .state.active { display: block; }
+
+    /* Login form */
+    .form-group { margin-bottom: 12px; }
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 4px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 13px;
+      outline: none;
+    }
+    .form-group input:focus { border-color: #3b82f6; }
+    .btn {
+      width: 100%;
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-primary { background: #3b82f6; color: #fff; }
+    .btn-primary:hover { background: #2563eb; }
+    .btn-secondary { background: #f3f4f6; color: #374151; margin-top: 8px; }
+    .btn-secondary:hover { background: #e5e7eb; }
+    .btn-danger { background: #fef2f2; color: #dc2626; margin-top: 8px; }
+    .btn-danger:hover { background: #fee2e2; }
+    .error { color: #dc2626; font-size: 12px; margin-top: 8px; display: none; }
+
+    /* JD Selector */
+    .jd-select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-bottom: 12px;
+      outline: none;
+    }
+    .jd-select:focus { border-color: #3b82f6; }
+
+    /* Stats Dashboard */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .stat-card {
+      padding: 10px;
+      border-radius: 8px;
+      background: #f9fafb;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 22px;
+      font-weight: 800;
+    }
+    .stat-label {
+      font-size: 11px;
+      color: #6b7280;
+      margin-top: 2px;
+    }
+    .stat-green .stat-value { color: #16a34a; }
+    .stat-yellow .stat-value { color: #ca8a04; }
+    .stat-red .stat-value { color: #dc2626; }
+
+    .jd-info {
+      background: #f0f9ff;
+      padding: 10px 12px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+    }
+    .jd-info-title { font-weight: 600; font-size: 13px; }
+    .jd-info-client { font-size: 11px; color: #6b7280; }
+
+    .user-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 16px;
+      background: #f9fafb;
+      border-top: 1px solid #e5e7eb;
+      font-size: 12px;
+      color: #6b7280;
+    }
+    .user-info a {
+      color: #3b82f6;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .user-info a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>RecruitAI Screener</h1>
+    <p>AI-powered RESDEX candidate screening</p>
+  </div>
+
+  <!-- State: Login -->
+  <div id="state-login" class="state active">
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="you@company.com" />
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="Password" />
+    </div>
+    <button class="btn btn-primary" id="login-btn">Login</button>
+    <div class="error" id="login-error"></div>
+  </div>
+
+  <!-- State: JD Selector -->
+  <div id="state-jd" class="state">
+    <label class="form-group">
+      <label>Select Active JD</label>
+      <select class="jd-select" id="jd-select">
+        <option value="">Loading JDs...</option>
+      </select>
+    </label>
+    <button class="btn btn-primary" id="jd-activate-btn">Activate JD</button>
+    <button class="btn btn-secondary" id="jd-logout-btn">Logout</button>
+  </div>
+
+  <!-- State: Dashboard -->
+  <div id="state-dashboard" class="state">
+    <div class="jd-info" id="dashboard-jd-info">
+      <div class="jd-info-title" id="dashboard-jd-title"></div>
+      <div class="jd-info-client" id="dashboard-jd-client"></div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="stat-total">0</div>
+        <div class="stat-label">Scored</div>
+      </div>
+      <div class="stat-card stat-green">
+        <div class="stat-value" id="stat-green">0</div>
+        <div class="stat-label">Strong (80+)</div>
+      </div>
+      <div class="stat-card stat-yellow">
+        <div class="stat-value" id="stat-yellow">0</div>
+        <div class="stat-label">Maybe (50-79)</div>
+      </div>
+      <div class="stat-card stat-red">
+        <div class="stat-value" id="stat-red">0</div>
+        <div class="stat-label">Weak (&lt;50)</div>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="dashboard-open-app">Open Dashboard</button>
+    <button class="btn btn-secondary" id="dashboard-change-jd">Change JD</button>
+    <button class="btn btn-danger" id="dashboard-clear-cache">Clear Cache</button>
+  </div>
+
+  <div class="user-info" id="user-info" style="display:none">
+    <span id="user-email"></span>
+    <a id="logout-link">Logout</a>
+  </div>
+
+  <script src="dist/popup.js" type="module"></script>
+</body>
+</html>

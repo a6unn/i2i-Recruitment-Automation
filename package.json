@@ -1,0 +1,21 @@
+{
+  "name": "recruitment-automation",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "dev:web": "cd apps/web && npm run dev",
+    "dev:extension": "cd apps/extension && npm run dev",
+    "db:push": "cd apps/web && npx prisma db push",
+    "db:generate": "cd apps/web && npx prisma generate",
+    "db:studio": "cd apps/web && npx prisma studio"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.0"
+  }
+}
